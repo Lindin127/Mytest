@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+     http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/context
+     http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <bean id="redisSentinelConfiguration" class="org.springframework.data.redis.connection.RedisSentinelConfiguration">
+        <constructor-arg name="master" value="${redis.adapter.master}"/>
+        <constructor-arg name="sentinelHostAndPorts" value="${redis.adapter.address}"/>
+    </bean>
+    <bean id="pool" class="redis.clients.jedis.JedisPoolConfig">
+        <!--最大能够保持idle的数量，控制一个pool最多有多少个状态为idle的jedis实例，默认值8-->
+        <property name="maxIdle" value="${redis.adapter.maxIdle}"/>
+        <!--在指定时刻通过pool能够获取到的最大的连接的jedis个数，默认值8-->
+        <property name="maxTotal" value="${redis.adapter.maxTotal}"/>
+        <!-- 连接最小空闲时间 -->
+        <property name="minEvictableIdleTimeMillis" value="${redis.adapter.minEvictableIdleTimeMillis}"/>
+        <!-- 每次释放连接的最大数目 -->
+        <property name="numTestsPerEvictionRun" value="${redis.adapter.numTestsPerEvictionRun}"/>
+        <!-- 在获取连接的时候检查有效性, 默认false 数据量大的时候建议关闭-->
+        <property name="testOnBorrow" value="${redis.adapter.testOnBorrow}"/>
+        <!-- 获取连接时的最大等待毫秒数,小于零:阻塞不确定的时间,默认-1 -->
+        <property name="maxWaitMillis" value="${redis.adapter.maxWaitMillis}"/>
+        <!-- 在空闲时检查有效性, 默认false -->
+        <property name="testWhileIdle" value="${redis.adapter.testWhileIdle}"/>
+    </bean>
+    <!--注入配置 JedisConnectionFactory 和 StringRedisTemplate -->
+    <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <constructor-arg name="sentinelConfig" ref="redisSentinelConfiguration"/>
+        <constructor-arg name="poolConfig" ref="pool"/>
+        <property name="password" value="${redis.adapter.password}"/>
+    </bean>
+    <bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+        <constructor-arg name="connectionFactory" ref="jedisConnectionFactory"/>
+    </bean>
+
+</beans>
