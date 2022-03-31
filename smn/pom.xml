@@ -10,7 +10,7 @@
  
  
     <properties>
-        <spring.version>5.0.2.RELEASE</spring.version>
+        <spring.version>5.3.18</spring.version>
         <!-- <latest.version>0.3.0</latest.version> -->
       <!--   <latest.version>0.2.2-RC1</latest.version> -->
         <latest.version>0.3.6</latest.version>
